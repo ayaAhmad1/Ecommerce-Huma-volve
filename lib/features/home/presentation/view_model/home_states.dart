@@ -1,19 +1,23 @@
-import 'package:commerce_app/features/home/services/models/category_model.dart';
-import 'package:commerce_app/features/home/services/models/product_model.dart';
+import 'package:commerce_app/features/home/domain/entities/home_category_entity.dart';
+import 'package:commerce_app/features/home/domain/entities/home_product_entity.dart';
 
-abstract class HomeStates {}
+abstract class HomeStates {
+  const HomeStates();
+}
 
-class HomeInitial extends HomeStates {}
+class HomeInitial extends HomeStates {
+  const HomeInitial();
+}
 
 class HomeDataState extends HomeStates {
-  final List<CategoryModel> categories;
-  final List<ProductModel> products;
+  final List<HomeCategoryEntity> categories;
+  final List<HomeProductEntity> products;
   final bool categoriesLoading;
   final bool productsLoading;
   final String? categoriesError;
   final String? productsError;
 
-  HomeDataState({
+  const HomeDataState({
     this.categories = const [],
     this.products = const [],
     this.categoriesLoading = false,
@@ -23,14 +27,14 @@ class HomeDataState extends HomeStates {
   });
 
   HomeDataState copyWith({
-    List<CategoryModel>? categories,
-    List<ProductModel>? products,
+    List<HomeCategoryEntity>? categories,
+    List<HomeProductEntity>? products,
     bool? categoriesLoading,
     bool? productsLoading,
     String? categoriesError,
     String? productsError,
-    bool clearProductsError = false,
     bool clearCategoriesError = false,
+    bool clearProductsError = false,
   }) {
     return HomeDataState(
       categories: categories ?? this.categories,

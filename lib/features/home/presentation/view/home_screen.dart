@@ -1,10 +1,10 @@
-import 'package:commerce_app/features/home/cubit/home_cubit.dart';
-import 'package:commerce_app/features/home/cubit/home_states.dart';
+import 'package:commerce_app/features/home/presentation/view_model/home_cubit.dart';
+import 'package:commerce_app/features/home/presentation/view_model/home_states.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../../core/dummy_data.dart';
-import '../../../core/theme.dart';
+import '../../../../core/dummy_data.dart';
+import '../../../../core/theme.dart';
 import 'widgets/category_chip.dart';
 import 'widgets/product_card.dart';
 
@@ -147,9 +147,20 @@ class _HomeScreenState extends State<HomeScreen> {
                         }
 
                         if (state.categoriesError != null) {
-                          return Text(
-                            'Error loading categories: '
-                            '${state.categoriesError}',
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Error loading categories: '
+                                '${state.categoriesError}',
+                              ),
+                              TextButton(
+                                onPressed: () {
+                                  context.read<HomeCubit>().loadHomeData();
+                                },
+                                child: const Text('Retry'),
+                              ),
+                            ],
                           );
                         }
 
@@ -158,6 +169,12 @@ class _HomeScreenState extends State<HomeScreen> {
                         if (categories.isEmpty) {
                           return const Text('No categories available');
                         }
+
+                        // Keep the selected index within valid bounds.
+                        final selectedIndex =
+                            _selectedCategoryIndex < categories.length
+                            ? _selectedCategoryIndex
+                            : 0;
 
                         return SizedBox(
                           height: 44,
@@ -168,8 +185,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                 const SizedBox(width: 12),
                             itemBuilder: (context, index) {
                               return CategoryChip(
-                                label: categories[index].name ?? 'Category',
-                                isSelected: _selectedCategoryIndex == index,
+                                label: categories[index].name,
+                                isSelected: selectedIndex == index,
                                 onTap: () {
                                   setState(() {
                                     _selectedCategoryIndex = index;
@@ -218,12 +235,36 @@ class _HomeScreenState extends State<HomeScreen> {
                   return SliverToBoxAdapter(
                     child: Padding(
                       padding: const EdgeInsets.all(24),
-                      child: Center(
-                        child: Text(
-                          'Error loading products:\n'
-                          '${state.productsError}',
-                          textAlign: TextAlign.center,
-                        ),
+                      child: Column(
+                        children: [
+                          Text(
+                            'Error loading products:\n'
+                            '${state.productsError}',
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(height: 12),
+                          ElevatedButton(
+                            onPressed: () {
+                              final categories = state.categories;
+
+                              if (categories.isNotEmpty) {
+                                final index =
+                                    _selectedCategoryIndex < categories.length
+                                    ? _selectedCategoryIndex
+                                    : 0;
+
+                                context
+                                    .read<HomeCubit>()
+                                    .loadProductsByCategory(
+                                      categories[index].id,
+                                    );
+                              } else {
+                                context.read<HomeCubit>().loadHomeData();
+                              }
+                            },
+                            child: const Text('Retry'),
+                          ),
+                        ],
                       ),
                     ),
                   );

@@ -1,18 +1,18 @@
+import 'package:commerce_app/features/home/domain/entities/home_product_entity.dart';
 import 'package:flutter/material.dart';
 
-import '../../../../core/theme.dart';
-import '../../../details/screens/product_details_screen.dart';
-import '../../../home/services/models/product_model.dart';
+import '../../../../../core/theme.dart';
+import '../../../../details/screens/product_details_screen.dart';
 
 class ProductCard extends StatelessWidget {
-  final ProductModel product;
+  final HomeProductEntity product;
 
   const ProductCard({super.key, required this.product});
 
   @override
   Widget build(BuildContext context) {
-    final imageUrl = product.images?.isNotEmpty == true
-        ? product.images!.first
+    final imageUrl = product.images.isNotEmpty == true
+        ? product.images.first
         : null;
 
     return GestureDetector(
@@ -104,7 +104,7 @@ class ProductCard extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     Text(
-                      product.title ?? 'Untitled product',
+                      product.title,
                       style: const TextStyle(
                         fontWeight: FontWeight.w600,
                         fontSize: 16,
@@ -119,7 +119,7 @@ class ProductCard extends StatelessWidget {
                       children: [
                         Flexible(
                           child: Text(
-                            '\$${(product.price ?? 0).toStringAsFixed(2)}',
+                            '\$${(product.price).toStringAsFixed(2)}',
                             style: const TextStyle(
                               color: AppTheme.primary,
                               fontWeight: FontWeight.bold,

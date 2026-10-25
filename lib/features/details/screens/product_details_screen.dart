@@ -1,18 +1,18 @@
+import 'package:commerce_app/features/home/domain/entities/home_product_entity.dart';
 import 'package:flutter/material.dart';
 
 import '../../../core/theme.dart';
 import '../../../core/widgets/primary_button.dart';
-import '../../home/services/models/product_model.dart';
 
 class ProductDetailsScreen extends StatelessWidget {
-  final ProductModel product;
+  final HomeProductEntity product;
 
   const ProductDetailsScreen({super.key, required this.product});
 
   @override
   Widget build(BuildContext context) {
-    final imageUrl = product.images?.isNotEmpty == true
-        ? product.images!.first
+    final imageUrl = product.images.isNotEmpty == true
+        ? product.images.first
         : null;
 
     return Scaffold(
@@ -84,20 +84,19 @@ class ProductDetailsScreen extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Product title and price
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Expanded(
                           child: Text(
-                            product.title ?? 'Untitled product',
+                            product.title,
                             style: Theme.of(context).textTheme.headlineLarge
                                 ?.copyWith(fontSize: 28, height: 1.2),
                           ),
                         ),
                         const SizedBox(width: 16),
                         Text(
-                          '\$${(product.price ?? 0).toStringAsFixed(2)}',
+                          '\$${(product.price).toStringAsFixed(2)}',
                           style: Theme.of(context).textTheme.headlineLarge
                               ?.copyWith(color: AppTheme.primary, fontSize: 24),
                         ),
@@ -115,7 +114,7 @@ class ProductDetailsScreen extends StatelessWidget {
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        product.category!.name!,
+                        product.category!.name,
                         style: Theme.of(context).textTheme.bodyMedium
                             ?.copyWith(fontSize: 16),
                       ),
@@ -130,8 +129,8 @@ class ProductDetailsScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      product.description?.isNotEmpty == true
-                          ? product.description!
+                      product.description.isNotEmpty == true
+                          ? product.description
                           : 'No description available.',
                       style: Theme.of(context).textTheme.bodyMedium
                           ?.copyWith(height: 1.6, fontSize: 16),
@@ -145,9 +144,7 @@ class ProductDetailsScreen extends StatelessWidget {
                       onPressed: () {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
-                            content: Text(
-                              '${product.title ?? 'Product'} added to cart',
-                            ),
+                            content: Text('${product.title} added to cart'),
                             behavior: SnackBarBehavior.floating,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(10),

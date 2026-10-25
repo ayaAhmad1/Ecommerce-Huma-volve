@@ -7,7 +7,7 @@ import '../../../../details/screens/product_details_screen.dart';
 class ProductCard extends StatelessWidget {
   final HomeProductEntity product;
 
-  const ProductCard({super.key, required this.product});
+  const ProductCard({super.key, required this.product, productModel});
 
   @override
   Widget build(BuildContext context) {

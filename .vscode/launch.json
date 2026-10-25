@@ -1,6 +1,8 @@
 {
   "version": "0.2.0",
   "configurations": [
+
+
     {
       "name": "C/C++ Runner: Debug Session",
       "type": "cppdbg",
@@ -9,7 +11,7 @@
       "stopAtEntry": false,
       "externalConsole": true,
       "cwd": "c:/Users/HardWare/Desktop/New folder/commerce_app",
-      "program": "c:/Users/HardWare/Desktop/New folder/commerce_app/build/Debug/outDebug",
+      "program": "${workspaceFolder}/build/windows/x64/runner/Release/commerce_app.exe",
       "MIMode": "gdb",
       "miDebuggerPath": "gdb",
       "setupCommands": [

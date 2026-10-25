@@ -9,44 +9,34 @@ class HomeInitial extends HomeStates {
   const HomeInitial();
 }
 
-class HomeDataState extends HomeStates {
+class CategoriesLoading extends HomeStates {}
+
+class CategoriesSuccess extends HomeStates {
   final List<HomeCategoryEntity> categories;
+  CategoriesSuccess(this.categories);
+}
+
+class CategoriesError extends HomeStates {
+  final String failureMessage;
+  CategoriesError(this.failureMessage);
+}
+
+class ProductsLoading extends HomeStates {}
+
+class ProductsSuccess extends HomeStates {
   final List<HomeProductEntity> products;
-  final bool categoriesLoading;
-  final bool productsLoading;
-  final String? categoriesError;
-  final String? productsError;
+  ProductsSuccess(this.products);
+}
 
-  const HomeDataState({
-    this.categories = const [],
-    this.products = const [],
-    this.categoriesLoading = false,
-    this.productsLoading = false,
-    this.categoriesError,
-    this.productsError,
-  });
+class ProductsError extends HomeStates {
+  final String failureMessage;
+  ProductsError(this.failureMessage);
+}
 
-  HomeDataState copyWith({
-    List<HomeCategoryEntity>? categories,
-    List<HomeProductEntity>? products,
-    bool? categoriesLoading,
-    bool? productsLoading,
-    String? categoriesError,
-    String? productsError,
-    bool clearCategoriesError = false,
-    bool clearProductsError = false,
-  }) {
-    return HomeDataState(
-      categories: categories ?? this.categories,
-      products: products ?? this.products,
-      categoriesLoading: categoriesLoading ?? this.categoriesLoading,
-      productsLoading: productsLoading ?? this.productsLoading,
-      categoriesError: clearCategoriesError
-          ? null
-          : categoriesError ?? this.categoriesError,
-      productsError: clearProductsError
-          ? null
-          : productsError ?? this.productsError,
-    );
-  }
+class ProductsLoadingMore extends HomeStates {}
+
+class ProductsLoadingError extends HomeStates {
+  final String errorMessage;
+
+  ProductsLoadingError({required this.errorMessage});
 }

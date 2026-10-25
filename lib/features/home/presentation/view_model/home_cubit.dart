@@ -1,76 +1,105 @@
+import 'package:commerce_app/features/home/domain/entities/home_product_entity.dart';
+import 'package:commerce_app/features/home/domain/use_cases/get_categories_use_case.dart';
+import 'package:commerce_app/features/home/domain/use_cases/get_products_use_case.dart';
+import 'package:commerce_app/features/home/presentation/view_model/home_states.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
-import '../../domain/use_cases/get_categories_use_case.dart';
-import '../../domain/use_cases/get_products_use_case.dart';
-import 'home_states.dart';
 
 class HomeCubit extends Cubit<HomeStates> {
   final GetCategoriesUseCase getCategoriesUseCase;
   final GetProductsUseCase getProductsUseCase;
 
+  final int limit = 10;
+  int offset = 0;
+
+  bool isLoadingMore = false;
+  bool hasMore = true;
+  int? selectedCategory;
+  final List<HomeProductEntity> _products = [];
+
   HomeCubit({
-    required this.getCategoriesUseCase,
     required this.getProductsUseCase,
+    required this.getCategoriesUseCase,
   }) : super(const HomeInitial());
 
   Future<void> loadHomeData() async {
-    emit(const HomeDataState(categoriesLoading: true, productsLoading: true));
+    emit(CategoriesLoading());
 
     final categoriesResult = await getCategoriesUseCase.invoke();
 
-    await categoriesResult.fold(
-      (failure) async {
-        emit(
-          HomeDataState(
-            categoriesLoading: false,
-            productsLoading: false,
-            categoriesError: failure.failureMessage,
-          ),
-        );
+    final categories = categoriesResult.fold(
+      (failure) {
+        emit(CategoriesError(failure.failureMessage));
+        return null;
       },
-      (categories) async {
-        emit(
-          HomeDataState(
-            categories: categories,
-            categoriesLoading: false,
-            productsLoading: categories.isNotEmpty,
-          ),
-        );
+      (categories) {
+        emit(CategoriesSuccess(categories));
+        return categories;
+      },
+    );
 
-        if (categories.isNotEmpty) {
-          await loadProductsByCategory(categories.first.id);
-        }
+    if (categories == null || categories.isEmpty) return;
+
+    await getProductsByCategoryId(categories.first.id);
+  }
+
+  Future<void> getProductsByCategoryId(int id) async {
+    selectedCategory = id;
+    offset = 0;
+    hasMore = true;
+    isLoadingMore = false;
+    _products.clear();
+
+    emit(ProductsLoading());
+
+    final result = await getProductsUseCase.invoke(
+      id,
+      limit: limit,
+      offset: offset,
+    );
+
+    result.fold(
+      (failure) {
+        emit(ProductsError(failure.failureMessage));
+      },
+      (products) {
+        _products.addAll(products);
+        offset = products.length;
+        hasMore = products.length >= limit;
+
+        emit(ProductsSuccess(List.from(_products)));
       },
     );
   }
 
-  Future<void> loadProductsByCategory(int id) async {
-    final current = state;
+  Future<void> loadMoreProducts() async {
+    final categoryId = selectedCategory;
 
-    if (current is! HomeDataState) return;
+    if (categoryId == null || isLoadingMore || !hasMore) return;
 
-    emit(current.copyWith(productsLoading: true, clearProductsError: true));
+    isLoadingMore = true;
+    emit(ProductsLoadingMore());
 
-    final productsResult = await getProductsUseCase.invoke(id);
+    try {
+      final result = await getProductsUseCase.invoke(
+        categoryId,
+        limit: limit,
+        offset: offset,
+      );
 
-    productsResult.fold(
-      (failure) {
-        emit(
-          (state as HomeDataState).copyWith(
-            productsLoading: false,
-            productsError: failure.failureMessage,
-          ),
-        );
-      },
-      (products) {
-        emit(
-          (state as HomeDataState).copyWith(
-            products: products,
-            productsLoading: false,
-            clearProductsError: true,
-          ),
-        );
-      },
-    );
+      result.fold(
+        (failure) {
+          emit(ProductsLoadingError(errorMessage: failure.failureMessage));
+        },
+        (newProducts) {
+          _products.addAll(newProducts);
+          offset += newProducts.length;
+          hasMore = newProducts.length >= limit;
+
+          emit(ProductsSuccess(List.from(_products)));
+        },
+      );
+    } finally {
+      isLoadingMore = false;
+    }
   }
 }

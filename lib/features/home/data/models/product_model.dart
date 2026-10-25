@@ -21,7 +21,7 @@ class HomeProductModel extends HomeProductEntity {
 
     category = json['category'] != null
         ? HomeCategoryModel.fromJson(json['category'])
-        : null!;
+        : null;
 
     images = json['images'].cast<String>();
   }

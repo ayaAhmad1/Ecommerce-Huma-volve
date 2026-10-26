@@ -1,8 +1,10 @@
+import 'package:commerce_app/core/widgets/product_image.dart';
 import 'package:commerce_app/features/home/domain/entities/home_product_entity.dart';
 import 'package:flutter/material.dart';
 
 import '../../../core/theme.dart';
 import '../../../core/widgets/primary_button.dart';
+import '../widgets/share_product_button.dart';
 
 class ProductDetailsScreen extends StatelessWidget {
   final HomeProductEntity product;
@@ -11,10 +13,6 @@ class ProductDetailsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final imageUrl = product.images.isNotEmpty == true
-        ? product.images.first
-        : null;
-
     return Scaffold(
       backgroundColor: AppTheme.background,
       body: CustomScrollView(
@@ -35,6 +33,7 @@ class ProductDetailsScreen extends StatelessWidget {
               onPressed: () => Navigator.pop(context),
             ),
             actions: [
+              ShareProductButton(productId: product.id.toString()),
               IconButton(
                 icon: Container(
                   padding: const EdgeInsets.all(8),
@@ -51,23 +50,11 @@ class ProductDetailsScreen extends StatelessWidget {
             flexibleSpace: FlexibleSpaceBar(
               background: Hero(
                 tag: 'product-${product.id}',
-                child: imageUrl != null
-                    ? Image.network(
-                        imageUrl,
-                        fit: BoxFit.cover,
-                        errorBuilder: (_, __, ___) => const Center(
-                          child: Icon(
-                            Icons.image_not_supported_outlined,
-                            size: 48,
-                          ),
-                        ),
-                      )
-                    : const Center(
-                        child: Icon(
-                          Icons.image_not_supported_outlined,
-                          size: 48,
-                        ),
-                      ),
+                child: ProductImage(
+                  imageUrls: product.images,
+                  fit: BoxFit.cover,
+                  errorIconSize: 48,
+                ),
               ),
             ),
           ),

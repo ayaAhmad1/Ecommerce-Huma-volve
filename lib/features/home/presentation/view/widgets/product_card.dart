@@ -14,7 +14,6 @@ class ProductCard extends StatelessWidget {
     final imageUrl = product.images.isNotEmpty == true
         ? product.images.first
         : null;
-
     return GestureDetector(
       onTap: () {
         Navigator.push(
